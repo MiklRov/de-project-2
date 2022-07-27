@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS public.shipping_country;
+DROP TABLE IF EXISTS public.shipping_country_rates;
 CREATE TABLE public.shipping_country_rates (
 shipping_country_id serial,
 shipping_country text,

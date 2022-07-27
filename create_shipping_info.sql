@@ -8,9 +8,9 @@ transfer_type_id bigint,
 shipping_country_id bigint,
 agreementid bigint,
 PRIMARY KEY (shippingid),
-FOREIGN KEY (transfer_type_id) REFERENCES shipping_transfer (transfer_type_id),
-FOREIGN KEY (shipping_country_id) REFERENCES shipping_country (shipping_country_id),
-FOREIGN KEY (agreementid) REFERENCES shipping_agreement (agreementid)
+FOREIGN KEY (transfer_type_id) REFERENCES shipping_transfer (transfer_type_id) ON UPDATE cascade,
+FOREIGN KEY (shipping_country_id) REFERENCES shipping_country_rates (shipping_country_id) ON UPDATE cascade,
+FOREIGN KEY (agreementid) REFERENCES shipping_agreement (agreementid) ON UPDATE cascade
 );
 
 INSERT INTO shipping_info
@@ -20,7 +20,7 @@ SELECT
 	main_table.payment_amount,
 	main_table.shipping_plan_datetime,
 	shipping_transfer.transfer_type_id,
-	shipping_country.shipping_country_id,
+	shipping_country_rates.shipping_country_id,
 	shipping_agreement.agreementid
 FROM (
 	SELECT DISTINCT
@@ -37,7 +37,7 @@ LEFT JOIN shipping_transfer
 ON 
 	(regexp_split_to_array(main_table.shipping_transfer_description, ':'))[1]::text=shipping_transfer.transfer_type AND
 	(regexp_split_to_array(main_table.shipping_transfer_description, ':'))[2]::text=shipping_transfer.transfer_model
-LEFT JOIN shipping_country ON main_table.shipping_country=shipping_country.shipping_country
+LEFT JOIN shipping_country_rates ON main_table.shipping_country=shipping_country_rates.shipping_country
 LEFT JOIN shipping_agreement
 ON
 	(regexp_split_to_array(main_table.vendor_agreement_description, ':'))[2]::text=shipping_agreement.agreement_number AND

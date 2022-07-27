@@ -4,7 +4,8 @@ shippingid bigint,
 status text,
 state text,
 shipping_start_fact_datetime timestamp,
-shipping_end_fact_datetime timestamp);
+shipping_end_fact_datetime timestamp,
+PRIMARY KEY (shippingid));
 
 INSERT INTO shipping_status
 with max_datetime as (SELECT 

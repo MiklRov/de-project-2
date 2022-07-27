@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS public.shipping_agreement;
 CREATE TABLE public.shipping_agreement (
-agreementid serial,
+agreementid integer,
 agreement_number text,
 agreement_rate NUMERIC(14,3),
 agreement_commission NUMERIC(14,3),
