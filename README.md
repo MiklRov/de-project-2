@@ -1,34 +1,16 @@
-# Проект 2
-Опишите здесь поэтапно ход решения задачи. Вы можете ориентироваться на тот план выполнения проекта, который мы предлагаем в инструкции на платформе.
+# Shipping data warehouse
 
+Normalising a single flat `shipping` table into a small warehouse: reference
+tables, a fact table with foreign keys, a status table with calculated delivery
+dates, and an analytical view on top.
 
-### 0. Создание исходной таблицы `Shipping`
+## Steps
 
-### 1. Создание таблицы `shipping_country`
-    Создаём справочник стоимости доставки в страны из данных, указанных в shipping_country и shipping_country_base_rate
+1. `create_shipping_country_rates.sql` - reference table of shipping rates by country
+2. `create_shipping_agreement.sql` - vendor agreements and tariffs, parsed out of the source field
+3. `create_shipping_transfer.sql` - reference table of delivery types
+4. `create_shipping_info.sql` - core shipping table, with foreign keys to the three references above
+5. `create_shipping_status.sql` - current status per shipment, with calculated delivery dates
+6. `create_view_shipping_datamart.sql` - the analytical view: revenue, cost and delivery time per vendor
 
-### 2. Создание таблицы `shipping_agreement`
-    Создаём справочник тарифов доставки вендора по договору из данных строки vendor_agreement_description
-
-### 3. Создание таблицы `shipping_transfer`
-    Создаём справочник о типах доставки из строки shipping_transfer_description
-
-### 4. Создание таблицы `shipping_info`
-    Создаём таблицу shipping_info с уникальными доставками shippingid и связываем её с созданными справочниками shipping_country_rates, shipping_agreement, shipping_transfer и константной информацией о доставке shipping_plan_datetime , payment_amount , vendorid 
-
-### 5. Создание таблицы `shipping_status`
-    Создаём таблицу статусов о доставке shipping_status и включаем туда информацию из лога shipping (status , state). Добавляем туда вычислимую информацию по фактическому времени доставки shipping_start_fact_datetime, shipping_end_fact_datetime . Отражаем для каждого уникального shippingid его итоговое состояние доставки
-
-### 6. Создание представления `shipping_datamart`
-    Создаём представление shipping_datamart на основании готовых таблиц для аналитики и включаем в него:
-shippingid
-vendorid
-transfer_type — тип доставки из таблицы shipping_transfer
-full_day_at_shipping — количество полных дней, в течение которых длилась доставка. Высчитывается как:shipping_end_fact_datetime-shipping_start_fact_datetime.
-is_delay — статус, показывающий просрочена ли доставка. Высчитывается как:shipping_end_fact_datetime >> shipping_plan_datetime → 1 ; 0
-is_shipping_finish — статус, показывающий, что доставка завершена. Если финальный status = finished → 1; 0
-delay_day_at_shipping — количество дней, на которые была просрочена доставка. Высчитыается как: shipping_end_fact_datetime >> shipping_end_plan_datetime → shipping_end_fact_datetime -− shipping_plan_datetime ; 0).
-payment_amount — сумма платежа пользователя
-vat — итоговый налог на доставку. Высчитывается как: payment_amount *∗ ( shipping_country_base_rate ++ agreement_rate ++ shipping_transfer_rate) .
-profit — итоговый доход компании с доставки. Высчитывается как: payment_amount*∗ agreement_commission.
-
+Written in SQL on PostgreSQL.
